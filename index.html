@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Zara AR | Augmented Reality Fashion Experience</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0a0a0a;
+      color: #f5f5f5;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1a1a1a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #d4af37;
+      border-radius: 8px;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 5%;
+      backdrop-filter: blur(12px);
+      background: rgba(0,0,0,0.6);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(212,175,55,0.3);
+    }
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #f9f9f9, #d4af37);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .logo span {
+      font-weight: 300;
+      font-size: 1rem;
+      background: none;
+      color: #d4af37;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+    }
+    .nav-links a {
+      color: #ddd;
+      text-decoration: none;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+    .nav-links a:hover {
+      color: #d4af37;
+    }
+    .ar-badge {
+      background: rgba(212,175,55,0.2);
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      border: 1px solid rgba(212,175,55,0.6);
+    }
+
+    .hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      background: radial-gradient(circle at 20% 30%, #1e1a0c, #020202);
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background: repeating-linear-gradient(45deg, rgba(212,175,55,0.02) 0px, rgba(212,175,55,0.02) 2px, transparent 2px, transparent 8px);
+      animation: drift 20s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes drift {
+      0% { transform: translate(0,0);}
+      100% { transform: translate(20px,20px);}
+    }
+    .hero h1 {
+      font-size: clamp(2.8rem, 8vw, 5.5rem);
+      font-weight: 700;
+      z-index: 2;
+    }
+    .hero h1 .ar-glow {
+      color: #d4af37;
+      text-shadow: 0 0 15px rgba(212,175,55,0.6);
+    }
+    .hero p {
+      max-width: 600px;
+      margin: 1.5rem auto;
+      font-size: 1.2rem;
+      color: #ccc;
+      z-index: 2;
+    }
+    .cta-button {
+      background: transparent;
+      border: 2px solid #d4af37;
+      color: #d4af37;
+      padding: 0.9rem 2.2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: 0.3s;
+      backdrop-filter: blur(5px);
+      margin-top: 1rem;
+      z-index: 2;
+    }
+    .cta-button:hover {
+      background: #d4af37;
+      color: #0a0a0a;
+      box-shadow: 0 0 20px rgba(212,175,55,0.5);
+      transform: scale(1.02);
+    }
+
+    .ar-preview {
+      position: absolute;
+      bottom: 8%;
+      right: 5%;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(12px);
+      padding: 0.8rem 1.2rem;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-left: 3px solid #d4af37;
+      font-size: 0.85rem;
+      font-weight: 500;
+      z-index: 3;
+    }
+    .pulse-dot {
+      width: 12px;
+      height: 12px;
+      background: #d4af37;
+      border-radius: 50%;
+      box-shadow: 0 0 8px gold;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.4; transform: scale(0.8);}
+      100% { opacity: 1; transform: scale(1.2);}
+    }
+
+    .gallery {
+      padding: 6rem 5% 5rem;
+      background: #0c0b0a;
+    }
+    .section-title {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+    .section-title span {
+      color: #d4af37;
+      border-bottom: 2px solid #d4af37;
+      display: inline-block;
+      padding-bottom: 5px;
+    }
+    .sub {
+      text-align: center;
+      color: #aaa;
+      margin-bottom: 3rem;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+    .clothing-card {
+      background: #141211;
+      border-radius: 28px;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      border: 1px solid #2a251f;
+      cursor: pointer;
+    }
+    .clothing-card:hover {
+      transform: translateY(-8px);
+      border-color: #d4af37;
+      box-shadow: 0 20px 35px -15px rgba(0,0,0,0.6), 0 0 0 1px rgba(212,175,55,0.2);
+    }
+    .card-img {
+      width: 100%;
+      height: 360px;
+      object-fit: cover;
+    }
+    .card-info {
+      padding: 1.5rem;
+    }
+    .card-info h3 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+    .price {
+      color: #d4af37;
+      font-weight: 600;
+      margin: 0.5rem 0;
+    }
+    .ar-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(212,175,55,0.15);
+      padding: 0.3rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #d4af37;
+      margin-top: 0.6rem;
+    }
+
+    .ar-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.94);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .ar-modal.active {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .ar-container {
+      background: #11100e;
+      width: 90%;
+      max-width: 1000px;
+      border-radius: 48px;
+      border: 1px solid #d4af37;
+      overflow: hidden;
+    }
+    .ar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 1.8rem;
+      background: #1c1a17;
+      border-bottom: 1px solid #2f2a24;
+    }
+    .ar-header h2 {
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .close-ar {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      cursor: pointer;
+      color: #ccc;
+    }
+    .close-ar:hover {
+      color: #d4af37;
+    }
+    .ar-viewer {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 2rem;
+      gap: 2rem;
+      justify-content: center;
+      align-items: center;
+    }
+    .ar-model-area {
+      flex: 1;
+      min-width: 240px;
+      background: radial-gradient(circle at center, #20201e, #050505);
+      border-radius: 32px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .canvas-ar {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      max-width: 300px;
+      background: #00000055;
+      border-radius: 24px;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .ar-preview-img {
+      width: 100%;
+      height: auto;
+      border-radius: 24px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      transition: transform 0.2s ease;
+      object-fit: cover;
+    }
+    .ar-badge-3d {
+      position: absolute;
+      bottom: 10px;
+      right: 15px;
+      background: #d4af37cc;
+      backdrop-filter: blur(8px);
+      border-radius: 30px;
+      padding: 5px 12px;
+      font-size: 0.7rem;
+      font-weight: bold;
+      color: black;
+    }
+    .ar-controls {
+      margin-top: 1rem;
+      display: flex;
+      gap: 1rem;
+    }
+    .ar-btn {
+      background: #2a2724;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 40px;
+      color: #ddd;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .ar-btn.primary {
+      background: #d4af37;
+      color: black;
+    }
+    .ar-btn:hover {
+      background: #3b3631;
+    }
+    .ar-details {
+      flex: 1;
+      min-width: 200px;
+    }
+    .ar-details h3 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+    .ar-desc {
+      color: #bcb6aa;
+      margin: 1rem 0;
+      line-height: 1.4;
+    }
+    .instruction {
+      background: #1e1b18;
+      padding: 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 1rem;
+    }
+    @media (max-width: 700px) {
+      .ar-viewer { flex-direction: column; }
+      .navbar { padding: 1rem 5%; }
+      .nav-links { gap: 1rem; }
+    }
+
+    footer {
+      background: #050505;
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid #222;
+      font-size: 0.8rem;
+      color: #777;
+    }
+    .footer-highlight {
+      color: #d4af37;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo">ZARA <span>AR STUDIO</span></div>
+  <div class="nav-links">
+    <a href="#">Home</a>
+    <a href="#">AR Experience</a>
+    <a href="#">Collection</a>
+    <div class="ar-badge">🔮 LIVE AR</div>
+  </div>
+</nav>
+
+<main>
+  <section class="hero">
+    <h1>Step into <span class="ar-glow">Augmented Reality</span><br>Fashion Forward</h1>
+    <p>Try ZARA's latest collection with immersive AR. Point your camera, visualize clothes in real-space, and redefine your style.</p>
+    <button class="cta-button" id="exploreARBtn">✨ EXPLORE AR FITTING</button>
+    <div class="ar-preview">
+      <div class="pulse-dot"></div>
+      <span>AR active — 360° virtual try-on ready</span>
+    </div>
+  </section>
+
+  <section class="gallery" id="gallery">
+    <div class="section-title"><span>AR CLOTHING</span> collection</div>
+    <div class="sub">Tap any item to activate AR preview • lifelike textures & motion</div>
+    <div class="card-grid" id="clothingGrid"></div>
+  </section>
+</main>
+
+<footer>
+  <p>© 2025 ZARA AR EXPERIENCE — Augmented Reality Innovation | <span class="footer-highlight">Try any piece with your camera</span></p>
+</footer>
+
+<div id="arModal" class="ar-modal">
+  <div class="ar-container">
+    <div class="ar-header">
+      <h2>🔍 <span id="modalProductName">ZARA AR Visualizer</span></h2>
+      <button class="close-ar" id="closeModalBtn">&times;</button>
+    </div>
+    <div class="ar-viewer">
+      <div class="ar-model-area">
+        <div class="canvas-ar">
+          <img id="arPreviewImage" class="ar-preview-img" src="" alt="AR clothing preview">
+          <div class="ar-badge-3d">🔮 AR READY</div>
+        </div>
+        <div class="ar-controls">
+          <button class="ar-btn" id="rotateLeftBtn">↺ ROTATE</button>
+          <button class="ar-btn primary" id="fullARTrigger">📱 START AR CAMERA</button>
+        </div>
+        <p style="font-size:12px; margin-top:8px;">*simulated AR view • drag or rotate</p>
+      </div>
+      <div class="ar-details">
+        <h3 id="modalItemName">Limited Edition Jacket</h3>
+        <div class="price" id="modalPrice">$129.00</div>
+        <p class="ar-desc" id="modalDesc">Experience hyper-realistic augmented reality. See how the fabric moves and reflects light.</p>
+        <div class="instruction">
+          <span>📱</span> <span>Point camera at floor — virtual garment will appear. Rotate for 360 view.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // UPDATED: More appropriate dress + AR Denim Jeans instead of jacket
+  const clothingItems = [
+    {
+      id: 1,
+      name: "Oversized Blazer AR",
+      price: "$159.00",
+      description: "Structured wool blend with AR interaction — see the tailored fit on your body in real-time. Premium sustainable fabric with sharp shoulders and relaxed silhouette.",
+      image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&h=800&fit=crop",
+      arPreview: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&h=800&fit=crop",
+      alt: "Elegant oversized blazer - Zara AR"
+    },
+    {
+      id: 2,
+      name: "Silk Evening Gown AR",
+      price: "$249.00",
+      description: "Elegant floor-length silk gown with AR light interaction. Experience how the fabric drapes and catches light in real-time through your camera.",
+      image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=600&h=800&fit=crop",
+      arPreview: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=600&h=800&fit=crop",
+      alt: "Elegant silk evening gown - Zara AR"
+    },
+    {
+      id: 3,
+      name: "AR Denim Jeans",
+      price: "$79.00",
+      description: "Classic slim-fit denim jeans with AR tech. Virtual try-on, customizable distressing, and smart tags that unlock digital styling tips.",
+      image: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&h=800&fit=crop",
+      arPreview: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&h=800&fit=crop",
+      alt: "AR enabled denim jeans - Zara"
+    },
+    {
+      id: 4,
+      name: "Smart Knit Sweater",
+      price: "$89.00",
+      description: "Cozy merino wool sweater with embedded AR tags — show interactive patterns when viewed through ZARA AR app. Warm, breathable, and tech-enabled.",
+      image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&h=800&fit=crop",
+      arPreview: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&h=800&fit=crop",
+      alt: "Warm knit sweater - Zara AR"
+    }
+  ];
+
+  const gridContainer = document.getElementById('clothingGrid');
+  const arModal = document.getElementById('arModal');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const modalProductName = document.getElementById('modalProductName');
+  const modalItemName = document.getElementById('modalItemName');
+  const modalPrice = document.getElementById('modalPrice');
+  const modalDesc = document.getElementById('modalDesc');
+  const arPreviewImage = document.getElementById('arPreviewImage');
+  const rotateLeftBtn = document.getElementById('rotateLeftBtn');
+  const fullARTrigger = document.getElementById('fullARTrigger');
+  
+  let currentItem = null;
+  let rotationAngle = 0;
+
+  function renderCards() {
+    gridContainer.innerHTML = '';
+    clothingItems.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'clothing-card';
+      card.innerHTML = `
+        <img class="card-img" src="${item.image}" alt="${item.alt}" loading="lazy">
+        <div class="card-info">
+          <h3>${item.name}</h3>
+          <div class="price">${item.price}</div>
+          <div class="ar-tag">
+            <span>🔮</span> AR experience ready
+          </div>
+        </div>
+      `;
+      card.addEventListener('click', () => openARModal(item));
+      gridContainer.appendChild(card);
+    });
+  }
+
+  function openARModal(item) {
+    currentItem = item;
+    modalProductName.innerText = `${item.name}`;
+    modalItemName.innerText = item.name;
+    modalPrice.innerText = item.price;
+    modalDesc.innerText = item.description;
+    arPreviewImage.src = item.arPreview;
+    arPreviewImage.alt = item.alt;
+    rotationAngle = 0;
+    arPreviewImage.style.transform = `rotateY(0deg)`;
+    arModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function rotateImage() {
+    if (!arPreviewImage) return;
+    rotationAngle = (rotationAngle + 15) % 360;
+    arPreviewImage.style.transform = `rotateY(${rotationAngle}deg)`;
+    arPreviewImage.style.transition = 'transform 0.2s ease';
+  }
+
+  function triggerARExperiment() {
+    if (!currentItem) return;
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      alert(`✨ ZARA AR ACTIVATED!\n\nNow visualizing "${currentItem.name}" in augmented reality.\n\nPoint your camera at a flat surface to see the virtual garment.`);
+      arPreviewImage.style.filter = "drop-shadow(0 0 8px gold)";
+      setTimeout(() => {
+        arPreviewImage.style.filter = "";
+      }, 800);
+      showCameraSimulationToast();
+    } else {
+      alert("📱 AR Camera Demo\n\nIn a real implementation, this would launch your camera. For now, enjoy the 360° rotation feature!");
+      showCameraSimulationToast();
+    }
+  }
+
+  function showCameraSimulationToast() {
+    const toast = document.createElement('div');
+    toast.innerText = "📸 AR MODE ACTIVE: Virtual garment ready for 360° viewing";
+    toast.style.position = 'fixed';
+    toast.style.bottom = '20px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.backgroundColor = '#d4af37';
+    toast.style.color = '#000';
+    toast.style.padding = '12px 20px';
+    toast.style.borderRadius = '40px';
+    toast.style.fontWeight = 'bold';
+    toast.style.zIndex = '1100';
+    toast.style.fontSize = '0.85rem';
+    toast.style.boxShadow = '0 4px 12px black';
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 500);
+    }, 2500);
+  }
+
+  function closeModal() {
+    arModal.classList.remove('active');
+    document.body.style.overflow = '';
+    if (arPreviewImage) {
+      arPreviewImage.style.transform = '';
+    }
+    rotationAngle = 0;
+  }
+
+  const exploreBtn = document.getElementById('exploreARBtn');
+  exploreBtn.addEventListener('click', () => {
+    const gallerySection = document.getElementById('gallery');
+    gallerySection.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+      if (clothingItems.length) {
+        openARModal(clothingItems[0]);
+      }
+    }, 800);
+  });
+
+  rotateLeftBtn.addEventListener('click', rotateImage);
+  fullARTrigger.addEventListener('click', triggerARExperiment);
+  closeModalBtn.addEventListener('click', closeModal);
+  arModal.addEventListener('click', (e) => {
+    if (e.target === arModal) closeModal();
+  });
+  
+  renderCards();
+
+  window.addEventListener('load', () => {
+    console.log('ZARA AR ready — updated with elegant gown + AR denim jeans');
+    if (clothingItems[0]) {
+      arPreviewImage.src = clothingItems[0].arPreview;
+    }
+  });
+</script>
+</body>
+</html>
